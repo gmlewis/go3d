@@ -41,9 +41,9 @@ func (bez *T) Tangent(t float64) vec2.T {
 	return Tangent(&bez.P0, &bez.P1, &bez.P2, t)
 }
 
-// Length returns the length of a quadratic bezier spline.
-func (bez *T) Length() float64 {
-	return Length(&bez.P0, &bez.P1, &bez.P2)
+// Length returns the length of a quadratic bezier spline from A.Point to t (0,1).
+func (bez *T) Length(t float64) float64 {
+	return Length(&bez.P0, &bez.P1, &bez.P2, t)
 }
 
 // Point returns a point on a quadratic bezier spline at t (0,1).
@@ -85,8 +85,11 @@ func Tangent(p0, p1, p2 *vec2.T, t float64) vec2.T {
 	return result
 }
 
-// Length returns the length of a quadratic bezier spline.
-func Length(p0, p1, p2 *vec2.T) float64 {
+// Length returns the length of a quadratic bezier spline from p0 to t (0,1).
+//
+// Note that although this calculation is accurate at t=0, 0.5, and 1 due
+// to the nature of quadratic curves, it is an approximation for other values of t.
+func Length(p0, p1, p2 *vec2.T, t float64) float64 {
 	ax := p0[0] - 2*p1[0] + p2[0]
 	ay := p0[1] - 2*p1[1] + p2[1]
 	bx := 2*p1[0] - 2*p0[0]
@@ -102,5 +105,5 @@ func Length(p0, p1, p2 *vec2.T) float64 {
 	c2 := 2 * math.Sqrt(c)
 	ba := b / a2
 
-	return (a32*abc + a2*b*(abc-c2) + (4*c*a-b*b)*math.Log((2*a2+ba+abc)/(ba+c2))) / (4 * a32)
+	return t * (a32*abc + a2*b*(abc-c2) + (4*c*a-b*b)*math.Log((2*a2+ba+abc)/(ba+c2))) / (4 * a32)
 }
